@@ -28,7 +28,7 @@
 //!     type Error = Error;
 //!
 //!     fn from_path<P: AsRef<Path>>(path: P) -> Result<Self, Self::Error> {
-//!         read_to_string(path).map(Content::new)
+//!         read_to_string(path).map(Self::new)
 //!     }
 //! }
 //!
