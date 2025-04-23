@@ -21,7 +21,7 @@ Or by directly specifying it in the configuration like so:
 
 ```toml
 [dependencies]
-from-path = "0.1.0"
+from-path = "0.2.0"
 ```
 
 Alternatively, you can add it directly from the source:
