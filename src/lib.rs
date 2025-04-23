@@ -2,19 +2,20 @@
 //!
 //! This crate provides the [`FromPath`] trait for types that can have values loaded from paths.
 //!
-//! There is also the [`from_path`] convenience function for when the types can be inferred.
+//! There are also the [`load`] convenience function and the [`Load`] extension trait for
+//! when the types can be inferred.
 //!
 //! # Example
 //!
-//! Assuming there is some file named `hello-world` with the content `Hello, world!`,
-//! we first implement the trait and then load the content from the file:
+//! Firstly, we need to implement the [`FromPath`] trait, and then use it via [`load`] or [`Load`]:
 //!
 //! ```rust
 //! use std::{fs::read_to_string, io::Error, path::Path};
 //!
-//! use from_path::{FromPath, from_path};
+//! use from_path::{load, FromPath, Load};
 //!
-//! struct Content {
+//! #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+//! pub struct Content {
 //!     pub string: String,
 //! }
 //!
@@ -32,9 +33,15 @@
 //!     }
 //! }
 //!
-//! let content: Content = from_path("hello-world").unwrap();
+//! let path = "hello-world";
+//!
+//! let content: Content = load(path).unwrap();
 //!
 //! assert_eq!(content.string.trim(), "Hello, world!");
+//!
+//! let extended: Content = path.load().unwrap();
+//!
+//! assert_eq!(content, extended);
 //! ```
 
 #![forbid(unsafe_code)]
@@ -66,6 +73,31 @@ pub trait FromPath: Sized {
 /// Returns [`Error`] when loading fails.
 ///
 /// [`Error`]: FromPath::Error
-pub fn from_path<F: FromPath, P: AsRef<Path>>(path: P) -> Result<F, F::Error> {
+pub fn load<F: FromPath, P: AsRef<Path>>(path: P) -> Result<F, F::Error> {
     F::from_path(path)
+}
+
+mod sealed {
+    pub trait Sealed {}
+}
+
+/// Loading values from paths (sealed extension trait).
+pub trait Load: sealed::Sealed {
+    /// Loads the value of type [`F`] from the path.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`F::Error`] when loading fails.
+    ///
+    /// [`F`]: FromPath
+    /// [`F::Error`]: FromPath::Error
+    fn load<F: FromPath>(&self) -> Result<F, F::Error>;
+}
+
+impl<P: AsRef<Path>> sealed::Sealed for P {}
+
+impl<P: AsRef<Path>> Load for P {
+    fn load<F: FromPath>(&self) -> Result<F, F::Error> {
+        load(self)
+    }
 }
