@@ -94,9 +94,9 @@ pub trait Load: sealed::Sealed {
     fn load<F: FromPath>(&self) -> Result<F, F::Error>;
 }
 
-impl<P: AsRef<Path>> sealed::Sealed for P {}
+impl<P: AsRef<Path> + ?Sized> sealed::Sealed for P {}
 
-impl<P: AsRef<Path>> Load for P {
+impl<P: AsRef<Path> + ?Sized> Load for P {
     fn load<F: FromPath>(&self) -> Result<F, F::Error> {
         load(self)
     }

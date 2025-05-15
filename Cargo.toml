@@ -1,8 +1,8 @@
 [package]
 name = "from-path"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["nekitdev <nekit@nekit.dev>"]
-edition = "2021"
+edition = "2024"
 description = "Loading values from paths."
 documentation = "https://docs.rs/from-path"
 readme = "README.md"
